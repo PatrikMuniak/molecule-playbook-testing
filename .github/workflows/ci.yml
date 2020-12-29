@@ -10,7 +10,7 @@ jobs:
   test:
     name: Molecule
     runs-on: ubuntu-latest
-    startegy:
+    strategy:
       matrix: 
         distro:
           - centos8
