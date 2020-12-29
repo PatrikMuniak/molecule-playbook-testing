@@ -1,0 +1,53 @@
+---
+- name: Install Apache.
+  hosts: all
+  become: true
+
+  vars:
+    apache_package: apache2
+    apache_service: apache2
+
+  handlers:
+    - name: restart apache
+      service: 
+        name: "{{ apache_service }}"
+        state: restarted
+
+  pre_tasks:
+    - name: Override Apache vars for Red Hat.
+      set_fact:
+        apache_package: httpd
+        apache_service: httpd
+      when: ansible_os_family == 'RedHat'
+        
+
+
+  tasks: 
+    - name: Molecule Hello World!
+      debug:
+        msg: Hello, World!
+    - name: Install Apache.
+      package:
+        name: "{{ apache_package }}"
+        state: present
+      
+    - name: Copy a web page.
+      copy: 
+        content: |
+          <html>
+          <head><title>Hello world</title></head>
+          body><h1>Hello world!!!!!!!!!!</h1>
+          <p>Woooow!!!! I'm using ansible and I created a website in 20 seconds</p>
+          </html>
+
+        dest: "/var/www/html/index.html"
+      notify: 
+        - restart apache
+
+
+
+    - name: Make sure Apache is started now and at boot.
+      service: 
+        name: "{{ apache_service }}"
+        state: started
+        enabled: true
